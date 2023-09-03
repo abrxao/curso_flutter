@@ -1,7 +1,9 @@
 import 'package:chat_app/pages/chat_page.dart';
 import 'package:chat_app/services/auth/auth_services.dart';
+import 'package:chat_app/services/auth/chat/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chat_app/components/my_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,10 +16,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _firebaseAuth = FirebaseAuth.instance;
+  final ChatService _chatService = ChatService();
+  final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   void signOut() {
     final authService = Provider.of<AuthService>(context, listen: false);
     authService.signOut();
+  }
+
+  void sendMessage() async {
+    if (_messageController.text.isNotEmpty &&
+        _emailController.text.isNotEmpty) {
+      try {
+        await _chatService.sendMessage(
+            message: _messageController.text,
+            receiverEmail: _emailController.text);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Email não encontrado')));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Verifique os campos vazios')));
+    }
   }
 
   @override
@@ -25,7 +47,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        title: const Text('Home Page'),
+        title: Text(
+          'Conversas de ${_firebaseAuth.currentUser!.email}',
+          style: const TextStyle(fontSize: 16),
+        ),
         actions: [
           Tooltip(
               message: 'Sair',
@@ -34,12 +59,22 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: _buildUserList(),
+      floatingActionButton: Tooltip(
+        message: 'Nova mensagem',
+        child: FloatingActionButton(
+          onPressed: () {
+            _modalNewMessage();
+          },
+          backgroundColor: Theme.of(context).primaryColor,
+          child: const Icon(Icons.chat_bubble_outline_rounded),
+        ),
+      ),
     );
   }
 
   Widget _buildUserList() {
     return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        stream: _chatService.getChats(_firebaseAuth.currentUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('error');
@@ -61,11 +96,19 @@ class _HomePageState extends State<HomePage> {
   Widget _buildUserListItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
-    if (_firebaseAuth.currentUser!.email != data['email']) {
+    if (_firebaseAuth.currentUser!.uid != data['id']) {
+      var _buildHasNotification = data['newMessage'] == true
+          ? Positioned(
+              right: 12,
+              child: Icon(
+                Icons.circle_notifications,
+                color: Theme.of(context).primaryColor,
+              ),
+            )
+          : Container();
       return ListTile(
-        visualDensity: VisualDensity.compact,
         title: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 16),
             decoration: BoxDecoration(
                 border: BorderDirectional.lerp(
                     BorderDirectional(
@@ -73,20 +116,80 @@ class _HomePageState extends State<HomePage> {
                     BorderDirectional(
                         bottom: BorderSide(color: Theme.of(context).cardColor)),
                     1)),
-            child: Text(data['name'])),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Text(data['name']),
+                _buildHasNotification,
+              ],
+            )),
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => ChatPage(
-                        receiverUserEmail: data['name'],
-                        receiverUserId: data['uid'],
+                        receiverUserName: data['name'],
+                        receiverUserId: data['id'],
                       )));
         },
       );
     } else {
       return Container();
     }
+  }
+
+  _modalNewMessage() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 150),
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Row(children: [
+                      Expanded(
+                          child: MyTextField(
+                        controller: _emailController,
+                        hintText: 'Email de destino',
+                        obscureText: false,
+                      )),
+                    ]),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: MyTextField(
+                          controller: _messageController,
+                          hintText: 'Digite uma messagem',
+                          obscureText: false,
+                        )),
+                        Tooltip(
+                          message: 'Enviar',
+                          child: IconButton(
+                              onPressed: () {
+                                sendMessage();
+                                _messageController.clear();
+                                _emailController.clear();
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.send,
+                              )),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   _modalLogout() {

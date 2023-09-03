@@ -22,21 +22,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void signUp() async {
     final authService = Provider.of<AuthService>(context, listen: false);
-    if (passwordController.text == confirmPasswordController.text &&
-        nameController.text.length > 5) {
-      try {
-        await authService.createAccountWithCredentials(
-            emailController.text, passwordController.text, nameController.text);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Conta criada')));
-        Navigator.pop(context);
-      } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
+    try {
+      if (passwordController.text != confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('As senhas diferem. Verifique as suas senhas.')));
+        return;
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verifique suas credenciais')));
+      if (nameController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Coloquem um nome valido')));
+        return;
+      }
+
+      await authService.createAccountWithCredentials(
+          emailController.text, passwordController.text, nameController.text);
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Conta criada')));
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 

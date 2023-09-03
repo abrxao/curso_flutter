@@ -38,12 +38,22 @@ class AuthService extends ChangeNotifier {
 
       return userCredential;
     } catch (e) {
-      if (e.toString() ==
-          '[firebase_auth/invalid-email] The email address is badly formatted.') {
-        throw Exception('Verifique seu email');
+      if (e is FirebaseAuthException) {
+        if (e.code == 'invalid-email') {
+          throw ErrorDescription('Verifique seu email');
+        } else if (e.code == 'weak-password') {
+          throw ErrorDescription('A senha é muito fraca. Tente outra.');
+        } else if (e.code == 'email-already-in-use') {
+          throw ErrorDescription(
+              'Este email já está em uso. Tente fazer login.');
+        } else {
+          // Outros erros do Firebase Auth
+          throw ErrorDescription('Erro ao criar a conta: ${e.message}');
+        }
+      } else {
+        // Lidar com exceções gerais que não são específicas do Firebase Auth
+        throw ErrorDescription(e.toString());
       }
-
-      throw Exception('Houve um erro. Verifique seus dados e tente novamente.');
     }
   }
 }

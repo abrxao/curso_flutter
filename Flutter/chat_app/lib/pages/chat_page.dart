@@ -5,11 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  final String receiverUserEmail;
+  final String receiverUserName;
   final String receiverUserId;
   const ChatPage(
       {super.key,
-      required this.receiverUserEmail,
+      required this.receiverUserName,
       required this.receiverUserId});
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -22,9 +22,15 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-          widget.receiverUserId, _messageController.text);
-      _messageController.clear();
+      try {
+        await _chatService.sendMessage(
+          message: _messageController.text,
+          receiverId: widget.receiverUserId,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Erro desconhecido')));
+      }
     }
   }
 
@@ -33,7 +39,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Theme.of(context).primaryColor,
-            title: Text(widget.receiverUserEmail)),
+            title: Text(widget.receiverUserName)),
         body: Column(
           children: [
             Expanded(child: _buildMessageList()),
@@ -68,6 +74,9 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildMessageItem(DocumentSnapshot document) {
+    _chatService.toggledNotification(
+        widget.receiverUserId, _firebaseAuth.currentUser!.uid, false);
+
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
     final Alignment alignment;
     final Color bgColor;
@@ -82,7 +91,7 @@ class _ChatPageState extends State<ChatPage> {
       crossAlignment = CrossAxisAlignment.end;
       mainAlignment = MainAxisAlignment.end;
     } else {
-      name = data['name'];
+      name = data['senderName'];
       alignment = Alignment.centerLeft;
       bgColor = Theme.of(context).cardColor;
       crossAlignment = CrossAxisAlignment.start;
@@ -131,7 +140,10 @@ class _ChatPageState extends State<ChatPage> {
           Tooltip(
             message: 'Enviar',
             child: IconButton(
-                onPressed: sendMessage,
+                onPressed: () {
+                  sendMessage();
+                  _messageController.clear();
+                },
                 icon: const Icon(
                   Icons.send,
                 )),
