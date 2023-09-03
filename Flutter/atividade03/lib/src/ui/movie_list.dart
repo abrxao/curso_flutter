@@ -1,3 +1,4 @@
+import 'package:atividade03/src/ui/widgets/pagination_buttons.dart';
 import 'package:flutter/material.dart';
 import '../models/item_model.dart';
 import '../blocs/movies_bloc.dart';
@@ -7,36 +8,53 @@ class MovieList extends StatelessWidget {
   Widget build(context) {
     moviesBloc.fetchAllMovies();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Popular Movies'),
-      ),
-      body: StreamBuilder(
-        stream: moviesBloc.allMovies,
-        builder: (context, AsyncSnapshot<ItemModel> snapshot) {
-          if (snapshot.hasData) {
-            return buildList(context, snapshot);
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
-      ),
-    );
+        appBar: AppBar(
+            title: Row(
+          children: [
+            const Expanded(child: Text('Popular Movies')),
+            StreamBuilder(
+                stream: moviesBloc.page,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text('Page ${snapshot.data}');
+                  } else if (snapshot.hasError) {
+                    return const Text('Error');
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                }),
+          ],
+        )),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              PaginationButton(),
+              StreamBuilder(
+                stream: moviesBloc.allMovies,
+                builder: (context, AsyncSnapshot<ItemModel> snapshot) {
+                  if (snapshot.hasData) {
+                    return buildList(context, snapshot);
+                  } else if (snapshot.hasError) {
+                    return Text(snapshot.error.toString());
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ],
+          ),
+        ));
   }
 
   Widget buildList(context, AsyncSnapshot<ItemModel> snapshot) {
-    return SingleChildScrollView(
-      child: Container(
-        width: double.infinity,
-        child: Wrap(
-            alignment: WrapAlignment.spaceAround,
-            children: (List.generate(
-                snapshot.data?.results.length ?? 0,
-                (index) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: movieCard(snapshot.data?.results[index] as Result),
-                    )))),
-      ),
+    return Container(
+      width: double.infinity,
+      child: Wrap(
+          alignment: WrapAlignment.spaceAround,
+          children: (List.generate(
+              snapshot.data?.results.length ?? 0,
+              (index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: movieCard(snapshot.data?.results[index] as Result),
+                  )))),
     );
   }
 }

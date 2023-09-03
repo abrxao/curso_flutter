@@ -6,9 +6,9 @@ import '../models/item_model.dart';
 class MovieApiProvider {
   final _apiKey = '7204bf3a518825b385b085dbc0700817';
 
-  Future<ItemModel> fetchMovieList() async {
-    final url =
-        Uri.parse("http://api.themoviedb.org/3/movie/popular?api_key=$_apiKey");
+  Future<ItemModel> fetchMovieList(int page) async {
+    final url = Uri.parse(
+        "http://api.themoviedb.org/3/movie/popular?api_key=$_apiKey&page=$page");
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
