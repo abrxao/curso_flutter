@@ -49,13 +49,17 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).primaryColor,
         title: Text(
           'Conversas de ${_firebaseAuth.currentUser!.email}',
-          style: const TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
         actions: [
           Tooltip(
               message: 'Sair',
               child: IconButton(
-                  onPressed: _modalLogout, icon: const Icon(Icons.logout)))
+                  onPressed: _modalLogout,
+                  icon: const Icon(
+                    Icons.logout,
+                    color: Colors.white,
+                  )))
         ],
       ),
       body: _buildUserList(),
@@ -66,7 +70,10 @@ class _HomePageState extends State<HomePage> {
             _modalNewMessage();
           },
           backgroundColor: Theme.of(context).primaryColor,
-          child: const Icon(Icons.chat_bubble_outline_rounded),
+          child: const Icon(
+            Icons.chat_bubble_outline_rounded,
+            color: Colors.white,
+          ),
         ),
       ),
     );

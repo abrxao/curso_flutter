@@ -38,8 +38,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+            iconTheme: const IconThemeData(color: Colors.white),
             backgroundColor: Theme.of(context).primaryColor,
-            title: Text(widget.receiverUserName)),
+            title: Text(
+              widget.receiverUserName,
+              style: const TextStyle(color: Colors.white),
+            )),
         body: Column(
           children: [
             Expanded(child: _buildMessageList()),
