@@ -68,6 +68,8 @@ class ChatService extends ChangeNotifier {
           .set({
         'name': userReceiverData['name'],
         'id': receiverId,
+        'lastMsgSenderID': currentUserId,
+        'lastMsg': message,
         'timestamp': timestamp,
       }, SetOptions(merge: true));
 
@@ -80,6 +82,8 @@ class ChatService extends ChangeNotifier {
         'name': userData['name'],
         'id': currentUserId,
         'timestamp': timestamp,
+        'lastMsgSenderID': currentUserId,
+        'lastMsg': message,
         'newMessage': true
       }, SetOptions(merge: true));
 

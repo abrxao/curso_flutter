@@ -103,16 +103,31 @@ class _HomePageState extends State<HomePage> {
   Widget _buildUserListItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
+    var whoSended = data['lastMsgSenderID'] == _firebaseAuth.currentUser!.uid
+        ? 'você'
+        : data['name'];
+    var lastMsg = data['lastMsg'] ?? 'teste';
+
     if (_firebaseAuth.currentUser!.uid != data['id']) {
       var _buildHasNotification = data['newMessage'] == true
           ? Positioned(
               right: 12,
               child: Icon(
-                Icons.circle_notifications,
+                Icons.circle,
                 color: Theme.of(context).primaryColor,
               ),
             )
           : Container();
+
+      var _buildLastMsg = Row(
+        children: [
+          Text(
+            '$whoSended: $lastMsg',
+            style: const TextStyle(fontSize: 14, color: Colors.black45),
+          ),
+        ],
+      );
+
       return ListTile(
         title: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 16),
@@ -123,11 +138,19 @@ class _HomePageState extends State<HomePage> {
                     BorderDirectional(
                         bottom: BorderSide(color: Theme.of(context).cardColor)),
                     1)),
-            child: Stack(
-              clipBehavior: Clip.none,
+            child: Column(
               children: [
-                Text(data['name']),
-                _buildHasNotification,
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text(
+                      data['name'],
+                      style: const TextStyle(fontSize: 18),
+                    )),
+                    _buildHasNotification,
+                  ],
+                ),
+                _buildLastMsg
               ],
             )),
         onTap: () {
