@@ -1,6 +1,7 @@
 import 'package:chat_app/pages/chat_page.dart';
 import 'package:chat_app/services/auth/auth_services.dart';
 import 'package:chat_app/services/auth/chat/chat_service.dart';
+import 'package:chat_app/utils/dataFormatter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:chat_app/components/my_text_field.dart';
@@ -106,7 +107,9 @@ class _HomePageState extends State<HomePage> {
     var whoSended = data['lastMsgSenderID'] == _firebaseAuth.currentUser!.uid
         ? 'você'
         : data['name'];
-    var lastMsg = data['lastMsg'] ?? 'teste';
+    var lastMsg = data['lastMsg'];
+
+    var dateMsg = DateFormatter.formatMessageDate(data['timestamp']);
 
     if (_firebaseAuth.currentUser!.uid != data['id']) {
       var _buildHasNotification = data['newMessage'] == true
@@ -123,6 +126,14 @@ class _HomePageState extends State<HomePage> {
         children: [
           Text(
             '$whoSended: $lastMsg',
+            style: const TextStyle(fontSize: 14, color: Colors.black45),
+          ),
+        ],
+      );
+      var _buildLastMsgDate = Row(
+        children: [
+          Text(
+            dateMsg,
             style: const TextStyle(fontSize: 14, color: Colors.black45),
           ),
         ],
@@ -150,7 +161,9 @@ class _HomePageState extends State<HomePage> {
                     _buildHasNotification,
                   ],
                 ),
-                _buildLastMsg
+                Row(
+                  children: [Expanded(child: _buildLastMsg), _buildLastMsgDate],
+                )
               ],
             )),
         onTap: () {
