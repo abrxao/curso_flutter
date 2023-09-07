@@ -113,12 +113,9 @@ class _HomePageState extends State<HomePage> {
 
     if (_firebaseAuth.currentUser!.uid != data['id']) {
       var _buildHasNotification = data['newMessage'] == true
-          ? Positioned(
-              right: 12,
-              child: Icon(
-                Icons.circle,
-                color: Theme.of(context).primaryColor,
-              ),
+          ? Icon(
+              Icons.circle,
+              color: Theme.of(context).primaryColor,
             )
           : Container();
 
