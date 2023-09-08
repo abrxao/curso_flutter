@@ -15,6 +15,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool _isPasswordHidden = true;
+
   void signIn() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     try {
@@ -24,6 +26,12 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
     }
+  }
+
+  void _toggleIcon() {
+    setState(() {
+      _isPasswordHidden = !_isPasswordHidden;
+    });
   }
 
   @override
@@ -54,10 +62,24 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 16,
               ),
-              MyTextField(
-                  controller: passwordController,
-                  hintText: 'Digite sua senha',
-                  obscureText: true),
+              Stack(alignment: AlignmentDirectional.center, children: [
+                MyTextField(
+                    controller: passwordController,
+                    hintText: 'Digite sua senha',
+                    obscureText: _isPasswordHidden),
+                Positioned(
+                  right: 8,
+                  child: IconButton(
+                      tooltip:
+                          _isPasswordHidden ? 'Ver senha' : 'Esconder senha',
+                      onPressed: () {
+                        _toggleIcon();
+                      },
+                      icon: _isPasswordHidden
+                          ? const Icon(Icons.visibility_off)
+                          : const Icon(Icons.visibility)),
+                ),
+              ]),
               const SizedBox(
                 height: 8,
               ),
