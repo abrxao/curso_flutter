@@ -1,16 +1,45 @@
-# chat_app
+# Chat app
 
-A new Flutter project.
+Um projeto de chat com flutter usando Firebase auth e Firestore.
 
-## Getting Started
+## Primeiros passos para rodar na sua máquina
 
-This project is a starting point for a Flutter application.
+1º Rodar o seguinte comando, após clonar o repo:
 
-A few resources to get you started if this is your first Flutter project:
+```sh
+flutter pub get
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+**Obs:** O projeto roda com as versões mais atuais de flutter e dart. Talvez seja necessario atualizar o seu SDK.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Página de Login
+
+![1694203501034](image/README/1694203501034.png)
+
+**Nessa pagina temos as seguintes funções:**
+
+- Quando um usuário insere seus dados no formulário de login, ocorre o seguinte processo: uma requisição é enviada para o Firebase Authentication. Se a conta do usuário for encontrada e suas credenciais estiverem corretas, o estado de autenticação no Firebase Authentication é atualizado. Em seguida, o código abaixo, que monitora o estado de autenticação, entra em ação e realiza a seguinte operação:
+
+```sh
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return const HomePage(); // Redireciona para a página inicial.
+        } else {
+          return const LoginPage(); // Mostra a página de login.
+        }
+      },
+    ),
+  );
+}
+
+```
+
+- Se ocorrerem erros nas credenciais durante o processo de autenticação, uma mensagem será exibida para informar ao usuário o tipo de erro que ocorreu.
+
+## Página de Registro
+
+![1694204815741](image/README/1694204815741.png)

@@ -18,7 +18,21 @@ class AuthService extends ChangeNotifier {
 
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.code);
+      // Capturar os erros específicos do FirebaseAuth
+      switch (e.code) {
+        case 'user-not-found':
+          throw ErrorDescription('Usuário não encontrado.');
+        case 'wrong-password':
+          throw ErrorDescription('Senha incorreta.');
+        case 'invalid-email':
+          throw ErrorDescription('Email invalido');
+        case 'too-many-requests':
+          throw ErrorDescription(
+              'Muitas tentativas de login. Tente novamente mais tarde.');
+        // Adicione mais casos conforme necessário para lidar com outros erros
+        default:
+          throw ErrorDescription('Erro de autenticação: ${e.code}');
+      }
     }
   }
 

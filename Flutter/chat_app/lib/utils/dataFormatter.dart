@@ -7,11 +7,9 @@ class DateFormatter {
     final dateTime = messageDate.toDate(); // Converte Timestamp para DateTime
     final difference = now.difference(dateTime);
 
-    if (difference.inDays == 0) {
-      // Hoje
+    if (now.day - dateTime.day == 0) {
       return DateFormat.Hm().format(dateTime);
-    } else if (difference.inDays == 1) {
-      // Ontem
+    } else if (now.day - dateTime.day == 1) {
       return 'Ontem';
     } else if (difference.inDays < 7) {
       // Esta semana
