@@ -43,3 +43,16 @@ Widget build(BuildContext context) {
 ## Página de Registro
 
 ![1694204815741](image/README/1694204815741.png)
+
+Na página de registro, assim como no login, há uma lógica para validar os dados e exibir a imagem de acordo. Após a conclusão bem-sucedida do processo de cadastro, o usuário é redirecionado para a página inicial, onde encontrará uma interface simples contendo apenas um botão para iniciar uma nova conversa. Que quando clicado abre um modal com dois campos.
+
+![1694205123924](image/README/1694205123924.png)
+![1694205176725](image/README/1694205176725.png)
+
+Tente enviar uma messagem para os seguintes e-mails:
+
+- abrxao@tops.com
+- teste@gmail.com
+
+![1694205339717](image/README/1694205339717.png)
+![1694205375507](image/README/1694205375507.png)
