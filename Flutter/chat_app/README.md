@@ -2,7 +2,7 @@
 
 Um projeto de chat com flutter usando Firebase auth e Firestore.
 
-## Primeiros passos para rodar na sua máquina
+## Primeiros passos para rodar na sua máquina.
 
 1º Rodar o seguinte comando, após clonar o repo:
 
