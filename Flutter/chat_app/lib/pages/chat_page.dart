@@ -1,5 +1,6 @@
 import 'package:chat_app/components/my_text_field.dart';
 import 'package:chat_app/services/auth/chat/chat_service.dart';
+import 'package:chat_app/utils/dataFormatter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -124,7 +125,14 @@ class _ChatPageState extends State<ChatPage> {
                   style: const TextStyle(fontSize: 16),
                 )),
             const SizedBox(
-              height: 12,
+              height: 4,
+            ),
+            Text(
+              DateFormatter.formatMessageDate(data['timestamp']),
+              style: const TextStyle(fontSize: 11, color: Colors.black45),
+            ),
+            const SizedBox(
+              height: 8,
             ),
           ]),
     );
